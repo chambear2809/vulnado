@@ -1,8 +1,16 @@
-FROM openjdk:8
+FROM maven:3.8.8-eclipse-temurin-11
 
 RUN apt-get update && \
-    apt-get install build-essential maven default-jdk cowsay netcat -y && \
-    update-alternatives --config javac
-COPY . .
+    apt-get install --no-install-recommends build-essential cowsay netcat-openbsd -y && \
+    rm -rf /var/lib/apt/lists/*
 
-CMD ["mvn", "spring-boot:run"]
+WORKDIR /app
+COPY pom.xml .
+RUN mvn -B dependency:go-offline
+
+COPY . .
+RUN mvn -B -DskipTests package
+
+EXPOSE 8080
+
+CMD ["java", "-jar", "target/vulnado-0.0.1-SNAPSHOT.jar"]

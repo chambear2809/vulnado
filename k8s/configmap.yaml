@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vulnado-config
+  labels:
+    app.kubernetes.io/part-of: vulnado
+data:
+  PGDATABASE: vulnado
+  PGHOST: db:5432
+  PGUSER: postgres
