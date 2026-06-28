@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: internal-site
+  labels:
+    app.kubernetes.io/name: internal-site
+    app.kubernetes.io/component: internal-site
+    app.kubernetes.io/part-of: vulnado
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: internal-site
+      app.kubernetes.io/component: internal-site
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: internal-site
+        app.kubernetes.io/component: internal-site
+        app.kubernetes.io/part-of: vulnado
+    spec:
+      containers:
+        - name: internal-site
+          image: vulnado-internal-site
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 15
+            periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: internal-site
+  labels:
+    app.kubernetes.io/name: internal-site
+    app.kubernetes.io/component: internal-site
+    app.kubernetes.io/part-of: vulnado
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: internal-site
+    app.kubernetes.io/component: internal-site
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
